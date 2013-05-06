@@ -92,6 +92,10 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
 
   mom_sweep=direction+2*(sweep_number-1)
 
+!$OMP TARGET map(tofrom: vel1) &
+!$OMP map(tofrom: volume,mass_flux_x,mass_flux_y,vol_flux_x,vol_flux_y,density1,celldx,celldy) &
+!$OMP map(tofrom: mom_flux,advec_vel,node_flux,node_mass_post,node_mass_pre,post_vol,pre_vol)
+
 !$OMP PARALLEL
 
   IF(mom_sweep.EQ.1)THEN ! x 1
@@ -337,6 +341,7 @@ SUBROUTINE advec_mom_kernel(x_min,x_max,y_min,y_max,   &
   ENDIF
 
 !$OMP END PARALLEL
+!$OMP END TARGET
 
 END SUBROUTINE advec_mom_kernel
 

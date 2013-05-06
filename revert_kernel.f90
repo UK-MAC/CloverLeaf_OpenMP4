@@ -38,6 +38,8 @@ SUBROUTINE revert_kernel(x_min,x_max,y_min,y_max,density0,density1,energy0,energ
 
   INTEGER :: j,k
 
+!$OMP TARGET map(to: density0,energy0) map(from: density1,energy1)
+
 !$OMP PARALLEL
 
 !$OMP DO
@@ -57,6 +59,8 @@ SUBROUTINE revert_kernel(x_min,x_max,y_min,y_max,density0,density1,energy0,energ
 !$OMP END DO
 
 !$OMP END PARALLEL
+
+!$OMP END TARGET
 
 END SUBROUTINE revert_kernel
 

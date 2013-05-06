@@ -63,6 +63,13 @@ SUBROUTINE PdV_kernel(predict,                                          &
   REAL(KIND=8)  :: recip_volume,energy_change,min_cell_volume
   REAL(KIND=8)  :: right_flux,left_flux,top_flux,bottom_flux,total_flux
 
+!$OMP TARGET &
+!$OMP map(to: density0,energy0,pressure,viscosity,volume,xarea,xvel0,yarea,yvel0) &
+!$OMP map(to: xvel1,yvel1) &
+!$OMP map(tofrom: density1,energy1) &
+!$OMP map(tofrom: volume_change) &
+!$OMP map(to: predict)
+
 !$omp PARALLEL
 
   IF(predict)THEN
@@ -138,6 +145,7 @@ SUBROUTINE PdV_kernel(predict,                                          &
   ENDIF
 
 !$omp END PARALLEL
+!$OMP END TARGET
 
 END SUBROUTINE PdV_kernel
 

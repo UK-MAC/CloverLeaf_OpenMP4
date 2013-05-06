@@ -44,6 +44,8 @@ SUBROUTINE reset_field_kernel(x_min,x_max,y_min,y_max,    &
 
   INTEGER :: j,k
 
+!$OMP TARGET map(to: density1,energy1,xvel1,yvel1) &
+!$OMP   map(from: density0,energy0,xvel0,yvel0)
 !$OMP PARALLEL
 !$OMP DO
   DO k=y_min,y_max
@@ -77,6 +79,7 @@ SUBROUTINE reset_field_kernel(x_min,x_max,y_min,y_max,    &
   ENDDO
 !$OMP END DO
 !$OMP END PARALLEL
+!$OMP END TARGET
 
 END SUBROUTINE reset_field_kernel
 

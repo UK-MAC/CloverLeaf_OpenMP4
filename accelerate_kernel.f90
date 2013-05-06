@@ -54,6 +54,8 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
   INTEGER               :: j,k
   REAL(KIND=8)          :: nodal_mass
 
+!$OMP TARGET map(to: density0,volume,pressure,viscosity,xarea,yarea,xvel0,yvel0) &
+!$OMP        map(from: xvel1,yvel1,stepbymass)
 !$OMP PARALLEL
 
 !$OMP DO PRIVATE(nodal_mass)
@@ -116,6 +118,7 @@ SUBROUTINE accelerate_kernel(x_min,x_max,y_min,y_max,dt,     &
 !$OMP END DO
 
 !$OMP END PARALLEL
+!$OMP END TARGET
 
 END SUBROUTINE accelerate_kernel
 

@@ -79,6 +79,10 @@ SUBROUTINE advec_cell_kernel(x_min,       &
   REAL(KIND=8) :: diffuw,diffdw,limiter
   REAL(KIND=8), PARAMETER :: one_by_six=1.0_8/6.0_8
 
+!$OMP TARGET map(tofrom: density1,energy1) &
+!$OMP        map(tofrom: vol_flux_x,vol_flux_y,volume,mass_flux_x,mass_flux_y,vertexdx,vertexdy) &
+!$OMP        map(tofrom: pre_vol,post_vol,post_ener,pre_mass,post_mass,advec_vol,ener_flux)
+
 !$OMP PARALLEL
 
   IF(dir.EQ.g_xdir) THEN
@@ -253,6 +257,7 @@ SUBROUTINE advec_cell_kernel(x_min,       &
   ENDIF
 
 !$OMP END PARALLEL
+!$OMP END TARGET
 
 END SUBROUTINE advec_cell_kernel
 

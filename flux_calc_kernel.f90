@@ -46,6 +46,10 @@ SUBROUTINE flux_calc_kernel(x_min,x_max,y_min,y_max,dt,              &
 
   INTEGER :: j,k
 
+!$OMP TARGET &
+!$OMP   map (to: xvel0, yvel0,xvel1,yvel1,xarea,yarea) &
+!$OMP   MAP (tofrom: vol_flux_x,vol_flux_y)
+
 !$OMP PARALLEL
 
 !$OMP DO
@@ -67,6 +71,8 @@ SUBROUTINE flux_calc_kernel(x_min,x_max,y_min,y_max,dt,              &
 !$OMP END DO
 
 !$OMP END PARALLEL
+
+!$OMP END TARGET
 
 END SUBROUTINE flux_calc_kernel
 

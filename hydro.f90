@@ -75,7 +75,6 @@ SUBROUTINE hydro
     ENDIF
 
     ! Sometimes there can be a significant start up cost that appears in the first step.
-    ! Sometimes it is due to the number of MPI tasks, or OpenCL kernel compilation.
     ! On the short test runs, this can skew the results, so should be taken into account
     !  in recorded run times.
     IF(step.EQ.1) first_step=(timer() - step_time)
