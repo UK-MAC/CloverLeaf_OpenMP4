@@ -63,13 +63,13 @@ CONTAINS
   INTEGER :: fields(:),depth
 
   ! These need to be kept consistent with the data module to avoid use statement
-  INTEGER,      PARAMETER :: CHUNK_LEFT   =1    &
+  INTEGER                 :: CHUNK_LEFT   =1    &
                             ,CHUNK_RIGHT  =2    &
                             ,CHUNK_BOTTOM =3    &
                             ,CHUNK_TOP    =4    &
                             ,EXTERNAL_FACE=-1
 
-  INTEGER,      PARAMETER :: FIELD_DENSITY0   = 1         &
+  INTEGER                 :: FIELD_DENSITY0   = 1         &
                             ,FIELD_DENSITY1   = 2         &
                             ,FIELD_ENERGY0    = 3         &
                             ,FIELD_ENERGY1    = 4         &
@@ -87,6 +87,13 @@ CONTAINS
                             ,NUM_FIELDS       =15
 
   INTEGER :: j,k
+
+!$OMP TARGET map(density0,energy0,pressure,viscosity,soundspeed) &
+!$OMP  map(density1,energy1,xvel0,yvel0,xvel1,yvel1) &
+!$OMP  map(vol_flux_x,mass_flux_x,vol_flux_y,mass_flux_y) &
+!$OMP  map(to: chunk_neighbours,depth,fields)
+
+!!$OMP  map(to: CHUNK_LEFT,CHUNK_RIGHT,CHUNK_TOP,CHUNK_BOTTOM,EXTERNAL_FACE)
 
 !$OMP PARALLEL PRIVATE(j)
 
@@ -641,6 +648,8 @@ CONTAINS
   ENDIF
 
 !$OMP END PARALLEL
+
+!$OMP END TARGET
 
 END SUBROUTINE update_halo_kernel
 

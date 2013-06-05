@@ -39,28 +39,38 @@ SUBROUTINE pack_left_right_buffers(x_min,x_max,y_min,y_max,              &
 
   INTEGER      :: j,k,index
 
-!$OMP PARALLEL
+
+
+!!$OMP PARALLEL
   IF(chunk_left.NE.external_face) THEN
-!$OMP DO PRIVATE(index)
+!$OMP TARGET map(left_snd_buffer,field)
+!!$OMP PARALLEL DO PRIVATE(index)
     DO k=y_min-depth,y_max+y_inc+depth
       DO j=1,depth
         index=j+(k+depth-1)*depth
         left_snd_buffer(index)=field(x_min+x_inc-1+j,k)
       ENDDO
     ENDDO
-!$OMP END DO
+!!$OMP END PARALLEL DO
+!$OMP END TARGET
+!$OMP TARGET UPDATE from(left_snd_buffer(1:size))
   ENDIF
   IF(chunk_right.NE.external_face) THEN
-!$OMP DO PRIVATE(index)
+!$OMP TARGET map(right_snd_buffer,field)
+!!$OMP PARALLEL DO PRIVATE(index)
     DO k=y_min-depth,y_max+y_inc+depth
       DO j=1,depth
         index=j+(k+depth-1)*depth
         right_snd_buffer(index)=field(x_max+1-j,k)
       ENDDO
     ENDDO
-!$OMP END DO
+!!$OMP END PARALLEL DO
+!$OMP END TARGET
+!$OMP TARGET UPDATE from(right_snd_buffer(1:size))
   ENDIF
-!$OMP END PARALLEL
+!!$OMP END PARALLEL
+
+
 
 END SUBROUTINE pack_left_right_buffers
 
@@ -80,28 +90,36 @@ SUBROUTINE unpack_left_right_buffers(x_min,x_max,y_min,y_max,              &
 
   INTEGER      :: j,k,index
 
-!$OMP PARALLEL
+
+!!$OMP PARALLEL
   IF(chunk_left.NE.external_face) THEN
-!$OMP DO PRIVATE(index)
+!$OMP TARGET UPDATE to(left_rcv_buffer(1:size))
+!$OMP TARGET map(left_rcv_buffer,field)
+!!$OMP PARALLEL DO PRIVATE(index)
     DO k=y_min-depth,y_max+y_inc+depth
       DO j=1,depth
         index=j+(k+depth-1)*depth
         field(x_min-j,k)=left_rcv_buffer(index)
       ENDDO
     ENDDO
-!$OMP END DO
+!!$OMP END PARALLEL DO
+!$OMP END TARGET
   ENDIF
   IF(chunk_right.NE.external_face) THEN
-!$OMP DO PRIVATE(index)
+!$OMP TARGET UPDATE to(right_rcv_buffer(1:size))
+!$OMP TARGET map(right_rcv_buffer,field)
+!!$OMP PARALLEL DO PRIVATE(index)
     DO k=y_min-depth,y_max+y_inc+depth
       DO j=1,depth
         index=j+(k+depth-1)*depth
         field(x_max+x_inc+j,k)=right_rcv_buffer(index)
       ENDDO
     ENDDO
-!$OMP END DO
+!!$OMP END PARALLEL DO
+!$OMP END TARGET
   ENDIF
-!$OMP END PARALLEL
+!!$OMP END PARALLEL
+
 
 END SUBROUTINE unpack_left_right_buffers
 
@@ -121,28 +139,36 @@ SUBROUTINE pack_top_bottom_buffers(x_min,x_max,y_min,y_max,              &
 
   INTEGER      :: j,k,index
 
-!$OMP PARALLEL
+
+!!$OMP PARALLEL
   IF(chunk_bottom.NE.external_face) THEN
+!$OMP TARGET map(field,bottom_snd_buffer)
     DO k=1,depth
-!$OMP DO PRIVATE(index)
+!!$OMP PARALLEL DO PRIVATE(index)
       DO j=x_min-depth,x_max+x_inc+depth
         index=j+depth+(k-1)*(x_max+x_inc+(2*depth))
         bottom_snd_buffer(index)=field(j,y_min+y_inc-1+k)
       ENDDO
-!$OMP END DO
+!!$OMP END PARALLEL DO
     ENDDO
+!$OMP END TARGET
+!$OMP TARGET UPDATE from(bottom_snd_buffer(1:size))
   ENDIF
   IF(chunk_top.NE.external_face) THEN
+!$OMP TARGET map(field,top_snd_buffer)
     DO k=1,depth
-!$OMP DO PRIVATE(index)
+!!$OMP PARALLEL DO PRIVATE(index)
       DO j=x_min-depth,x_max+x_inc+depth
         index=j+depth+(k-1)*(x_max+x_inc+(2*depth))
         top_snd_buffer(index)=field(j,y_max+1-k)
       ENDDO
-!$OMP END DO
+!!$OMP END PARALLEL DO
     ENDDO
+!$OMP END TARGET
+!$OMP TARGET UPDATE from(depth,top_snd_buffer(1:size))
   ENDIF
-!$OMP END PARALLEL
+!!$OMP END PARALLEL
+
 
 END SUBROUTINE pack_top_bottom_buffers
 
@@ -162,28 +188,36 @@ SUBROUTINE unpack_top_bottom_buffers(x_min,x_max,y_min,y_max,             &
 
   INTEGER      :: j,k,index
 
-!$OMP PARALLEL
+
+!!$OMP PARALLEL
   IF(chunk_bottom.NE.external_face) THEN
+!$OMP TARGET UPDATE to(bottom_rcv_buffer(1:size))
+!$OMP TARGET map(field,bottom_rcv_buffer)
     DO k=1,depth
-!$OMP DO PRIVATE(index)
+!!$OMP PARALLEL DO PRIVATE(index)
       DO j=x_min-depth,x_max+x_inc+depth
         index=j+depth+(k-1)*(x_max+x_inc+(2*depth))
         field(j,y_min-k)=bottom_rcv_buffer(index)
       ENDDO
-!$OMP END DO
+!!$OMP END PARALLEL DO
     ENDDO
+!$OMP END TARGET
   ENDIF
   IF(chunk_top.NE.external_face) THEN
+!$OMP TARGET UPDATE to(depth,top_rcv_buffer(1:size))
+!$OMP TARGET map(field,top_rcv_buffer)
     DO k=1,depth
-!$OMP DO PRIVATE(index)
+!!$OMP PARALLEL DO PRIVATE(index)
       DO j=x_min-depth,x_max+x_inc+depth
         index=j+depth+(k-1)*(x_max+x_inc+(2*depth))
         field(j,y_max+y_inc+k)=top_rcv_buffer(index)
       ENDDO
-!$OMP END DO
+!!$OMP END PARALLEL DO
     ENDDO
+!$OMP END TARGET
   ENDIF
-!$OMP END PARALLEL
+!!$OMP END PARALLEL
+
 
 END SUBROUTINE unpack_top_bottom_buffers
 

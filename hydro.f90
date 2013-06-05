@@ -20,7 +20,56 @@
 !>  @details Controls the top level cycle, invoking all the drivers and checks
 !>  for outputs and completion.
 
-SUBROUTINE hydro
+MODULE hydro_cycle_module
+
+CONTAINS
+
+SUBROUTINE hydro_cycle(c,                 &
+                       x_min,             &
+                       x_max,             &
+                       y_min,             &
+                       y_max,             &
+                       density0,          &
+                       density1,          &
+                       energy0,           &
+                       energy1,           &
+                       pressure,          &
+                       soundspeed,        &
+                       viscosity,         &
+                       xvel0,             &
+                       yvel0,             &
+                       xvel1,             &
+                       yvel1,             &
+                       vol_flux_x,        &
+                       vol_flux_y,        &
+                       mass_flux_x,       &
+                       mass_flux_y,       &
+                       volume,            &
+                       work_array1,       &
+                       work_array2,       &
+                       work_array3,       &
+                       work_array4,       &
+                       work_array5,       &
+                       work_array6,       &
+                       work_array7,       &
+                       cellx,             &
+                       celly,             &
+                       celldx,            &
+                       celldy,            &
+                       vertexx,           &
+                       vertexdx,          &
+                       vertexy,           &
+                       vertexdy,          &
+                       xarea,             &
+                       yarea,             &
+                       left_snd_buffer,   &
+                       left_rcv_buffer,   &
+                       right_snd_buffer,  &
+                       right_rcv_buffer,  &
+                       bottom_snd_buffer, &
+                       bottom_rcv_buffer, &
+                       top_snd_buffer,    &
+                       top_rcv_buffer)
 
   USE clover_module
   USE timestep_module
@@ -33,6 +82,44 @@ SUBROUTINE hydro
 
   IMPLICIT NONE
 
+  INTEGER               :: c,x_min,x_max,y_min,y_max
+
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+2) :: density0
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+2) :: density1
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+2) :: energy0
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+2) :: energy1
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+2) :: soundspeed
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+2) :: pressure
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+2) :: viscosity
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: xvel0
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: yvel0
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: xvel1
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: yvel1
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+2) :: vol_flux_x
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+3) :: vol_flux_y
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+2) :: mass_flux_x
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+3) :: mass_flux_y
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+2) :: volume
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: work_array1
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: work_array2
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: work_array3
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: work_array4
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: work_array5
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: work_array6
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+3) :: work_array7
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2) :: cellx
+  REAL(KIND=8), DIMENSION(y_min-2:y_max+2) :: celly
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2) :: celldx
+  REAL(KIND=8), DIMENSION(y_min-2:y_max+2) :: celldy
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3) :: vertexx
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3) :: vertexdx
+  REAL(KIND=8), DIMENSION(y_min-2:y_max+3) :: vertexy
+  REAL(KIND=8), DIMENSION(y_min-2:y_max+3) :: vertexdy
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+3 ,y_min-2:y_max+2) :: xarea
+  REAL(KIND=8), DIMENSION(x_min-2:x_max+2 ,y_min-2:y_max+3) :: yarea
+  REAL(KIND=8) :: left_snd_buffer(:),left_rcv_buffer(:),right_snd_buffer(:),right_rcv_buffer(:)
+  REAL(KIND=8) :: bottom_snd_buffer(:),bottom_rcv_buffer(:),top_snd_buffer(:),top_rcv_buffer(:)
+
   INTEGER         :: loc(1)
   REAL(KIND=8)    :: timer,timerstart,wall_clock,step_clock
   
@@ -41,8 +128,16 @@ SUBROUTINE hydro
   REAL(KIND=8)    :: first_step,second_step
   REAL(KIND=8)    :: kernel_total,totals(parallel%max_task)
 
-  timerstart = timer()
 
+!$OMP TARGET DATA map(density0,density1,energy0,energy1,pressure,viscosity) &  
+!$OMP map(soundspeed,xvel0,xvel1,yvel0,yvel1,vol_flux_x,mass_flux_x,vol_flux_y)& 
+!$OMP map(mass_flux_y,work_array1,work_array2,work_array3,work_array4,work_array5)&
+!$OMP map(work_array6,work_array7,volume,xarea,yarea,cellx,celly) &
+!$OMP map(celldx,celldy,vertexx,vertexdx,vertexy,vertexdy) &   
+!$OMP map(left_snd_buffer,left_rcv_buffer,right_snd_buffer,right_rcv_buffer) &
+!$OMP map(bottom_snd_buffer,bottom_rcv_buffer,top_snd_buffer,top_rcv_buffer)
+
+  timerstart = timer()
   DO
 
     step_time = timer()
@@ -96,6 +191,23 @@ SUBROUTINE hydro
         WRITE(    0,*) 'Wall clock ', wall_clock
         WRITE(    0,*) 'First step overhead', first_step-second_step
       ENDIF
+
+      CALL clover_finalize
+
+      EXIT
+
+    END IF
+
+    IF (parallel%boss) THEN
+      WRITE(g_out,*)"Wall clock ",timer()-timerstart
+      WRITE(0    ,*)"Wall clock ",timer()-timerstart
+      cells = grid%x_cells * grid%y_cells
+      grind_time   = (timer() - timerstart) / (step * cells)
+      step_grind   = (timer() - step_time)/cells
+      WRITE(0    ,*)"Average time per cell ",grind_time
+      WRITE(g_out,*)"Average time per cell ",grind_time
+      WRITE(0    ,*)"Step time per cell    ",step_grind
+      WRITE(g_out,*)"Step time per cell    ",step_grind
 
       IF ( profiler_on ) THEN
         ! First we need to find the maximum kernel time for each task. This
@@ -159,29 +271,77 @@ SUBROUTINE hydro
           WRITE(g_out,'(a23,2f16.4)')"The Rest              :",wall_clock-kernel_total,100.0*(wall_clock-kernel_total)/wall_clock
         ENDIF
       ENDIF
-
-      CALL clover_finalize
-
-      EXIT
-
-    END IF
-
-    IF (parallel%boss) THEN
-      wall_clock=timer()-timerstart
-      step_clock=timer()-step_time
-      WRITE(g_out,*)"Wall clock ",wall_clock
-      WRITE(0    ,*)"Wall clock ",wall_clock
-      cells = grid%x_cells * grid%y_cells
-      rstep = step
-      grind_time   = wall_clock/(rstep * cells)
-      step_grind   = step_clock/cells
-      WRITE(0    ,*)"Average time per cell ",grind_time
-      WRITE(g_out,*)"Average time per cell ",grind_time
-      WRITE(0    ,*)"Step time per cell    ",step_grind
-      WRITE(g_out,*)"Step time per cell    ",step_grind
-
      END IF
 
   END DO
 
+!$OMP END TARGET DATA
+
+END SUBROUTINE hydro_cycle
+
+END MODULE hydro_cycle_module
+
+SUBROUTINE hydro
+
+  USE clover_module
+  USE hydro_cycle_module
+
+  IMPLICIT NONE
+
+  INTEGER         :: cells
+  REAL(KIND=8)    :: timer,timerstart
+
+  REAL(KIND=8)    :: grind_time
+  REAL(KIND=8)    :: step_time,step_grind
+
+  timerstart = timer()
+
+  CALL hydro_cycle(parallel%task+1,                          &
+                   chunks(parallel%task+1)%field%x_min,      &
+                   chunks(parallel%task+1)%field%x_max,      &
+                   chunks(parallel%task+1)%field%y_min,      &
+                   chunks(parallel%task+1)%field%y_max,      &
+                   chunks(parallel%task+1)%field%density0,   &
+                   chunks(parallel%task+1)%field%density1,   &
+                   chunks(parallel%task+1)%field%energy0,    &
+                   chunks(parallel%task+1)%field%energy1,    &
+                   chunks(parallel%task+1)%field%pressure,   &
+                   chunks(parallel%task+1)%field%soundspeed, &
+                   chunks(parallel%task+1)%field%viscosity,  &
+                   chunks(parallel%task+1)%field%xvel0,      &
+                   chunks(parallel%task+1)%field%yvel0,      &
+                   chunks(parallel%task+1)%field%xvel1,      &
+                   chunks(parallel%task+1)%field%yvel1,      &
+                   chunks(parallel%task+1)%field%vol_flux_x, &
+                   chunks(parallel%task+1)%field%vol_flux_y, &
+                   chunks(parallel%task+1)%field%mass_flux_x,&
+                   chunks(parallel%task+1)%field%mass_flux_y,&
+                   chunks(parallel%task+1)%field%volume,     &
+                   chunks(parallel%task+1)%field%work_array1,&
+                   chunks(parallel%task+1)%field%work_array2,&
+                   chunks(parallel%task+1)%field%work_array3,&
+                   chunks(parallel%task+1)%field%work_array4,&
+                   chunks(parallel%task+1)%field%work_array5,&
+                   chunks(parallel%task+1)%field%work_array6,&
+                   chunks(parallel%task+1)%field%work_array7,&
+                   chunks(parallel%task+1)%field%cellx,      &
+                   chunks(parallel%task+1)%field%celly,      &
+                   chunks(parallel%task+1)%field%celldx,     &
+                   chunks(parallel%task+1)%field%celldy,     &
+                   chunks(parallel%task+1)%field%vertexx,    &
+                   chunks(parallel%task+1)%field%vertexdx,   &
+                   chunks(parallel%task+1)%field%vertexy,    &
+                   chunks(parallel%task+1)%field%vertexdy,   &
+                   chunks(parallel%task+1)%field%xarea,      &
+                   chunks(parallel%task+1)%field%yarea,      &
+                   chunks(parallel%task+1)%left_snd_buffer,  &
+                   chunks(parallel%task+1)%left_rcv_buffer,  &
+                   chunks(parallel%task+1)%right_snd_buffer, &
+                   chunks(parallel%task+1)%right_rcv_buffer, &
+                   chunks(parallel%task+1)%bottom_snd_buffer,&
+                   chunks(parallel%task+1)%bottom_rcv_buffer,&
+                   chunks(parallel%task+1)%top_snd_buffer,   &
+                   chunks(parallel%task+1)%top_rcv_buffer)
+
 END SUBROUTINE hydro
+

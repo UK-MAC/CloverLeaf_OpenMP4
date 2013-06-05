@@ -55,6 +55,8 @@ SUBROUTINE initialise_chunk_kernel(x_min,x_max,y_min,y_max,       &
 
   INTEGER      :: j,k
 
+!$OMP TARGET map(from:vertexx,vertexdx,vertexy,vertexdy,cellx,celldx,celly,celldy,volume,xarea,yarea)
+
 !$OMP PARALLEL
 !$OMP DO
   DO j=x_min-2,x_max+3
@@ -128,6 +130,8 @@ SUBROUTINE initialise_chunk_kernel(x_min,x_max,y_min,y_max,       &
   ENDDO
 !$OMP END DO
 !$OMP END PARALLEL
+
+!$OMP END TARGET
 
 END SUBROUTINE initialise_chunk_kernel
 

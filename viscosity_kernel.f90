@@ -47,6 +47,9 @@ SUBROUTINE viscosity_kernel(x_min,x_max,y_min,y_max,    &
   REAL(KIND=8)  :: ugrad,vgrad,grad2,pgradx,pgrady,pgradx2,pgrady2,grad     &
                   ,ygrad,pgrad,xgrad,div,strain2,limiter
 
+!$OMP TARGET map(from: viscosity) &
+!$OMP  map(to: xvel0,yvel0,celldx,celldy,pressure,density0)
+
 !$OMP PARALLEL
 
 !$OMP DO PRIVATE(ugrad,vgrad,div,strain2,pgradx,pgrady,pgradx2,pgrady2,limiter,pgrad,xgrad,ygrad,grad,grad2)
@@ -89,6 +92,8 @@ SUBROUTINE viscosity_kernel(x_min,x_max,y_min,y_max,    &
 !$OMP END DO
 
 !$OMP END PARALLEL
+
+!$OMP END TARGET
 
 END SUBROUTINE viscosity_kernel
 

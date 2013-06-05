@@ -86,6 +86,10 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
   dt_min_val = g_big
   jk_control=1.1
 
+!$OMP TARGET map(to: xarea,yarea,cellx,celly,celldx,celldy,volume) &
+!$OMP  map(to: density0,energy0,pressure,viscosity,soundspeed,xvel0,yvel0) &
+!$OMP  map(from: dt_min) map(to: g_small,g_big)
+
 !$OMP PARALLEL
 
 !$OMP DO PRIVATE(dsx,dsy,cc,dv1,dv2,div,dtct,dtut,dtvt,dtdivt)
@@ -140,6 +144,8 @@ SUBROUTINE calc_dt_kernel(x_min,x_max,y_min,y_max,             &
 !$OMP END DO
 
 !$OMP END PARALLEL
+
+!$OMP END TARGET
 
   ! Extract the mimimum timestep information
   dtl_control=10.01*(jk_control-INT(jk_control))

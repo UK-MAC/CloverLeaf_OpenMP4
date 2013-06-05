@@ -51,6 +51,8 @@ SUBROUTINE field_summary_kernel(x_min,x_max,y_min,y_max, &
   ke=0.0
   press=0.0
 
+!$OMP TARGET map(to: volume,density0,energy0,pressure,xvel0,yvel0)
+
 !$OMP PARALLEL
 !$OMP DO PRIVATE(vsqrd,cell_vol,cell_mass) REDUCTION(+ : vol,mass,press,ie,ke)
   DO k=y_min,y_max
@@ -72,6 +74,8 @@ SUBROUTINE field_summary_kernel(x_min,x_max,y_min,y_max, &
   ENDDO
 !$OMP END DO
 !$OMP END PARALLEL
+
+!$OMP END TARGET
 
 END SUBROUTINE field_summary_kernel
 

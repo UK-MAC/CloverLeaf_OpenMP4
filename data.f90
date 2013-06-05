@@ -35,13 +35,13 @@ MODULE data_module
                              ,g_ydir=2
 
    ! These two need to be kept consistent with update_halo
-   INTEGER,      PARAMETER :: CHUNK_LEFT   =1    &
+   INTEGER                 :: CHUNK_LEFT   =1    &
                              ,CHUNK_RIGHT  =2    &
                              ,CHUNK_BOTTOM =3    &
                              ,CHUNK_TOP    =4    &
                              ,EXTERNAL_FACE=-1
 
-   INTEGER,         PARAMETER :: FIELD_DENSITY0   = 1         &
+   INTEGER                    :: FIELD_DENSITY0   = 1         &
                                 ,FIELD_DENSITY1   = 2         &
                                 ,FIELD_ENERGY0    = 3         &
                                 ,FIELD_ENERGY1    = 4         &
@@ -58,14 +58,14 @@ MODULE data_module
                                 ,FIELD_MASS_FLUX_Y=15         &
                                 ,NUM_FIELDS       =15
 
-   INTEGER,         PARAMETER :: CELL_DATA     = 1,        &
+   INTEGER                    :: CELL_DATA     = 1,        &
                                  VERTEX_DATA   = 2,        &
                                  X_FACE_DATA   = 3,        &
                                  y_FACE_DATA   = 4
 
 
    ! Time step control constants
-   INTEGER,        PARAMETER ::  SOUND = 1     &
+   INTEGER                   ::  SOUND = 1     &
                                 ,X_VEL = 2     &
                                 ,Y_VEL = 3     &
                                 ,DIVERG= 4
@@ -90,6 +90,6 @@ MODULE data_module
    
    TYPE(parallel_type) :: parallel
      
-   INTEGER,        PARAMETER ::g_len_max=500
+   INTEGER, PARAMETER        ::g_len_max=500
 
 END MODULE data_module

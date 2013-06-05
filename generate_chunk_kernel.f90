@@ -83,6 +83,11 @@ SUBROUTINE generate_chunk_kernel(x_min,x_max,y_min,y_max, &
 
   ! State 1 is always the background state
 
+!$OMP TARGET map(vertexx,vertexy,vertexdy,cellx,celly,density0,energy0) &
+!$OMP map(xvel0,yvel0,state_density,state_energy,state_xvel,state_yvel) &
+!$OMP map(state_xmin,state_xmax,state_ymin,state_ymax,state_radius,state_geometry) &
+!$OMP map(to: g_rect,g_circ,g_point)
+
 !$OMP PARALLEL SHARED(x_cent,y_cent)
 !$OMP DO
   DO k=y_min-2,y_max+2
@@ -166,6 +171,8 @@ SUBROUTINE generate_chunk_kernel(x_min,x_max,y_min,y_max, &
   ENDDO
 
 !$OMP END PARALLEL
+
+!$OMP END TARGET
 
 END SUBROUTINE generate_chunk_kernel
 

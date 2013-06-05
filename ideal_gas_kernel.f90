@@ -42,6 +42,9 @@ SUBROUTINE ideal_gas_kernel(x_min,x_max,y_min,y_max,                &
 
   REAL(KIND=8) :: sound_speed_squared,v,pressurebyenergy,pressurebyvolume
 
+!$OMP TARGET map(from: pressure,soundspeed) &
+!$OMP  map(to: density,energy)
+
 !$OMP PARALLEL
 !$OMP DO PRIVATE(v,pressurebyenergy,pressurebyvolume,sound_speed_squared)
   DO k=y_min,y_max
@@ -56,6 +59,8 @@ SUBROUTINE ideal_gas_kernel(x_min,x_max,y_min,y_max,                &
   ENDDO
 !$OMP END DO
 !$OMP END PARALLEL
+
+!$OMP END TARGET
 
 END SUBROUTINE ideal_gas_kernel
 

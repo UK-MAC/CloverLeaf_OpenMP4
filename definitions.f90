@@ -185,6 +185,7 @@ MODULE definitions_module
 
 
   TYPE(chunk_type),  ALLOCATABLE       :: chunks(:)
+!$OMP DECLARE TARGET(chunks)
   INTEGER                              :: number_of_chunks
 
   TYPE(grid_type)                      :: grid
